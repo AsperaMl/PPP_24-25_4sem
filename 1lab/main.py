@@ -1,8 +1,6 @@
-
-def main():
-    # Ваш код здесь
-    pass
+# 1lab/main.py
+import server
 
 if __name__ == "__main__":
-    main()
+    server.start_server()
 
