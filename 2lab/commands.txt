@@ -1,0 +1,8 @@
+docker run --name redis-server -p 6379:6379 -d redis
+docker ps
+docker start redis-server
+celery -A app.services.celery_worker.celery_app worker --loglevel=info
+uvicorn app.main:app --reload
+celery -A app.services.celery_worker.celery_app worker --loglevel=info -E
+docker restart redis-server
+docker logs redis-server
