@@ -6,3 +6,5 @@ uvicorn app.main:app --reload
 celery -A app.services.celery_worker.celery_app worker --loglevel=info -E
 docker restart redis-server
 docker logs redis-server
+$rar5$16$31a5febbc056205cfde59523656dfabf$15$6d4d2d8958f6b811f10080e6eeaf7132$8$146a11c1101b7cad
+abcdefghijklmnopqrstuvwxyz
