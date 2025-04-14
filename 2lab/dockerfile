@@ -1,0 +1,47 @@
+
+FROM python:3.9-slim
+
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    unrar \
+    && rm -rf /var/lib/apt/lists/*
+
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    redis-server \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY app/ ./app/
+COPY alembic/ ./alembic/
+COPY alembic.ini .
+COPY celery_worker.py .
+COPY app.db .
+
+# Создаем скрипт для запуска сервисов
+RUN echo '#!/bin/bash\n\
+# Запускаем Redis в фоновом режиме\n\
+redis-server --daemonize yes\n\
+\n\
+# Запускаем Celery worker в фоновом режиме\n\
+celery -A app.services.celery_worker.celery_app worker --loglevel=info --detach\n\
+\n\
+# Запускаем FastAPI\n\
+uvicorn app.main:app --host 0.0.0.0 --port 8000\n'\
+> /app/start.sh
+
+# Делаем скрипт исполняемым
+RUN chmod +x /app/start.sh
+
+# Открываем порт для FastAPI
+EXPOSE 8000
+
+# Команда для запуска всех сервисов
+CMD ["/app/start.sh"]
